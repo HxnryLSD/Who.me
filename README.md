@@ -45,4 +45,4 @@ SQLite database and session store files are created in the `data/` directory.
 - Passwords are hashed using bcrypt.
 
 ## License
-MIT
+Apache-2.0 license
