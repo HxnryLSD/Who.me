@@ -1,0 +1,262 @@
+<%- include('../partials/layout', { body: (function(){ /*
+<section class="dashboard">
+  <div class="grid two">
+    <div>
+      <h2>Your Profile</h2>
+      <form class="card form" method="POST" action="/dashboard/profile" enctype="multipart/form-data">
+        <% if (profile && profile.avatar_path) { %>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="<%= profile.avatar_path %>" alt="avatar" style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:1px solid #2a2e44;" />
+            <span class="muted">Change avatar</span>
+          </div>
+        <% } %>
+        <label>
+          <span>Profile picture</span>
+          <input type="file" name="avatar" accept="image/*" />
+        </label>
+        <label>
+          <span>Full name</span>
+          <input name="full_name" value="<%= (profile && profile.full_name) || '' %>" />
+        </label>
+        <div class="grid two">
+          <label>
+            <span>Birthday</span>
+            <input name="birthday" type="date" value="<%= (profile && profile.birthday) || '' %>" />
+          </label>
+          <label>
+            <span>City</span>
+            <input name="city" value="<%= (profile && profile.city) || '' %>" />
+          </label>
+        </div>
+        <label>
+          <span>Workplace</span>
+          <input name="workplace" value="<%= (profile && profile.workplace) || '' %>" />
+        </label>
+        <label>
+          <span>Bio</span>
+          <textarea name="bio" rows="3"><%= (profile && profile.bio) || '' %></textarea>
+        </label>
+        <div class="grid two">
+          <label>
+            <span>Theme</span>
+            <select name="theme">
+              <option value="" <%= (profile && !profile.theme) ? 'selected' : '' %> >Default</option>
+              <option value="dark" <%= (profile && profile.theme==='dark') ? 'selected' : '' %> >Dark</option>
+              <option value="light" <%= (profile && profile.theme==='light') ? 'selected' : '' %> >Light</option>
+              <option value="ocean" <%= (profile && profile.theme==='ocean') ? 'selected' : '' %> >Ocean</option>
+              <option value="forest" <%= (profile && profile.theme==='forest') ? 'selected' : '' %> >Forest</option>
+            </select>
+          </label>
+          <label>
+            <span>Custom CSS</span>
+            <textarea name="custom_css" rows="3" placeholder=":root { /* your vars */ }"> <%= (profile && profile.custom_css) || '' %></textarea>
+          </label>
+        </div>
+        <button class="btn" type="submit">Save</button>
+      </form>
+
+      <h2 style="margin-top:20px;">Your Routes</h2>
+      <form class="card form" method="POST" action="/dashboard/routes">
+        <div class="grid two">
+          <label>
+            <span>Vanity path</span>
+            <input name="vanity_path" placeholder="e.g., jane" value="<%= (route && route.vanity_path) || '' %>" />
+          </label>
+          <label>
+            <span>Custom domain</span>
+            <input name="custom_domain" placeholder="e.g., jane.example.com" value="<%= (route && route.custom_domain) || '' %>" />
+          </label>
+        </div>
+        <small class="muted">Visitors to your domain will see your profile. Vanity path serves at /your-path.</small>
+        <div style="margin-top:8px;"><button class="btn" type="submit">Save Routes</button></div>
+      </form>
+
+      <h2 style="margin-top:20px;">Projects</h2>
+      <form class="card form" method="POST" action="/dashboard/projects">
+        <div class="grid two">
+          <label><span>Title</span><input name="title" required /></label>
+          <label><span>URL</span><input name="url" placeholder="https://..." /></label>
+        </div>
+        <label><span>Description</span><textarea name="description" rows="3"></textarea></label>
+        <button class="btn" type="submit">Add Project</button>
+      </form>
+      <ul class="app-grid">
+        <% (projects || []).forEach(p => { %>
+          <li class="app-item">
+            <div class="app-meta">
+              <strong><%= p.title %></strong>
+              <% if (p.url) { %> • <a href="<%= p.url %>" target="_blank" rel="noopener">link</a><% } %>
+              <div class="muted"><%= p.description || '' %></div>
+            </div>
+            <form method="POST" action="/dashboard/projects/<%= p.id %>/delete" class="inline" style="margin-left:auto;">
+              <button class="btn danger" type="submit">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+
+      <h2 style="margin-top:20px;">Experience</h2>
+      <form class="card form" method="POST" action="/dashboard/experiences">
+        <div class="grid two">
+          <label><span>Role</span><input name="role" required /></label>
+          <label><span>Company</span><input name="company" /></label>
+        </div>
+        <div class="grid two">
+          <label><span>Start</span><input type="date" name="start_date" /></label>
+          <label><span>End</span><input type="date" name="end_date" /></label>
+        </div>
+        <label><span>Description</span><textarea name="description" rows="3"></textarea></label>
+        <button class="btn" type="submit">Add Experience</button>
+      </form>
+      <ul class="app-grid">
+        <% (experiences || []).forEach(xp => { %>
+          <li class="app-item">
+            <div class="app-meta">
+              <strong><%= xp.role %></strong> <% if (xp.company) { %> • <%= xp.company %><% } %>
+              <div class="muted"><%= xp.start_date || '' %> - <%= xp.end_date || 'Present' %></div>
+              <div class="muted"><%= xp.description || '' %></div>
+            </div>
+            <form method="POST" action="/dashboard/experiences/<%= xp.id %>/delete" class="inline" style="margin-left:auto;">
+              <button class="btn danger" type="submit">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+
+      <h2 style="margin-top:20px;">Contact</h2>
+      <form class="card form" method="POST" action="/dashboard/contacts">
+        <div class="grid two">
+          <label><span>Label</span><input name="label" placeholder="Email" required /></label>
+          <label><span>Value</span><input name="value" placeholder="you@example.com" required /></label>
+        </div>
+        <button class="btn" type="submit">Add Contact</button>
+      </form>
+      <ul class="app-grid">
+        <% (contacts || []).forEach(c => { %>
+          <li class="app-item">
+            <div class="app-meta"><strong><%= c.label %></strong> • <span class="muted"><%= c.value %></span></div>
+            <form method="POST" action="/dashboard/contacts/<%= c.id %>/delete" class="inline" style="margin-left:auto;">
+              <button class="btn danger" type="submit">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+    <div>
+      <h2>Your Links</h2>
+      <form class="card form" method="POST" action="/dashboard/links/quick-add">
+        <div class="grid two">
+          <label>
+            <span>Quick-add platform</span>
+            <select name="platform">
+              <option value="github">GitHub</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="x">X</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </label>
+          <label>
+            <span>Handle/username</span>
+            <input name="handle" placeholder="your-handle" />
+          </label>
+        </div>
+        <button class="btn" type="submit">Add Social Link</button>
+      </form>
+      <form class="card form" method="POST" action="/dashboard/links">
+        <div class="grid two">
+          <label>
+            <span>Label</span>
+            <input name="label" placeholder="e.g., GitHub" />
+          </label>
+          <label>
+            <span>URL</span>
+            <input name="url" placeholder="https://github.com/yourname" />
+          </label>
+        </div>
+        <div class="grid two">
+          <label>
+            <span>Tags (comma-separated)</span>
+            <input name="tags" placeholder="social, work" />
+          </label>
+          <label>
+            <span>Group</span>
+            <input name="group_name" placeholder="Social" />
+          </label>
+        </div>
+        <label>
+          <span>Thumbnail URL (optional)</span>
+          <input name="thumb_url" placeholder="https://.../image.png" />
+        </label>
+        <button class="btn" type="submit">Add Link</button>
+      </form>
+
+      <ul class="app-grid" id="linkList">
+        <% links.forEach(link => { %>
+          <li class="app-item" data-id="<%= link.id %>">
+            <img class="favicon" src="https://icons.duckduckgo.com/ip3/<%= new URL(link.url).hostname %>.ico" alt="" onerror="this.style.display='none'" />
+            <div class="app-meta">
+              <a class="app-label" href="<%= link.url %>" target="_blank" rel="noopener noreferrer"><%= link.label %></a>
+              <small class="muted"><%= link.url %></small>
+            </div>
+            <div style="margin-left:auto; display:flex; gap:6px;">
+              <form method="POST" action="/dashboard/links/<%= link.id %>/move?dir=up" class="inline">
+                <button class="btn secondary" type="submit" aria-label="Move up">↑</button>
+              </form>
+              <form method="POST" action="/dashboard/links/<%= link.id %>/move?dir=down" class="inline">
+                <button class="btn secondary" type="submit" aria-label="Move down">↓</button>
+              </form>
+              <form method="POST" action="/dashboard/links/<%= link.id %>/delete" class="inline">
+                <button class="btn danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+      <p class="muted">Tip: Your public page is at <a href="/u/<%= currentUser.username %>">/u/<%= currentUser.username %></a></p>
+
+      <h2 style="margin-top:20px;">Active Sessions</h2>
+      <ul class="app-grid">
+        <% (sessions || []).forEach(s => { %>
+          <li class="app-item">
+            <div class="app-meta">
+              <strong><%= s.session_id %></strong>
+              <div class="muted">Last seen: <%= s.last_seen %> • IP: <%= s.ip || '' %></div>
+              <div class="muted"><%= s.user_agent || '' %></div>
+            </div>
+            <form method="POST" action="/dashboard/sessions/<%= s.session_id %>/revoke" class="inline" style="margin-left:auto;">
+              <button class="btn danger" type="submit">Revoke</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+  </div>
+</section>
+<script>
+// Simple drag reorder (optional enhancement)
+(function(){
+  const list = document.getElementById('linkList');
+  if (!list) return;
+  let dragSrc;
+  list.querySelectorAll('li').forEach(li => {
+    li.draggable = true;
+    li.addEventListener('dragstart', e => { dragSrc = li; li.classList.add('dragging'); });
+    li.addEventListener('dragend', e => { li.classList.remove('dragging'); saveOrder(); });
+    li.addEventListener('dragover', e => { e.preventDefault(); const after = getDragAfterElement(list, e.clientY); if (after == null) { list.appendChild(li); } else { list.insertBefore(li, after); } });
+  });
+  function getDragAfterElement(container, y) {
+    const els = [...container.querySelectorAll('li:not(.dragging)')];
+    return els.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) return { offset, element: child };
+      else return closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+  async function saveOrder() {
+    const order = [...list.querySelectorAll('li')].map(li => li.dataset.id);
+    await fetch('/dashboard/links/reorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order }) });
+  }
+})();
+</script>
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>

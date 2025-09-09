@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title || 'Who.Me' %></title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <% if (typeof profileCustomCss !== 'undefined' && profileCustomCss) { %>
+      <style><%- profileCustomCss %></style>
+    <% } %>
+  </head>
+  <body class="<%= (typeof profileTheme !== 'undefined' && profileTheme) ? `theme-${profileTheme}` : '' %>">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand">Who.Me</a>
+        <nav>
+          <% if (currentUser) { %>
+            <a href="/dashboard">Dashboard</a>
+            <form action="/auth/logout?_method=POST" method="POST" style="display:inline">
+              <button class="linklike" type="submit">Logout</button>
+            </form>
+          <% } else { %>
+            <a href="/auth/login">Login</a>
+            <a href="/auth/register" class="cta">Sign up</a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <% if (messages().error) { %>
+        <div class="alert error"><%= messages().error[0] %></div>
+      <% } %>
+      <% if (messages().success) { %>
+        <div class="alert success"><%= messages().success[0] %></div>
+      <% } %>
+      <%- body %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <%= new Date().getFullYear() %> Who.Me</p>
+      </div>
+    </footer>
+  </body>
+</html>

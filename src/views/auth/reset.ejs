@@ -1,0 +1,19 @@
+<%- include('../partials/layout', { body: (function(){ /*
+<section class="auth">
+  <h1>Reset your password</h1>
+  <form method="POST" action="/auth/reset/<%= token %>" class="card form">
+    <div class="grid two">
+      <label>
+        <span>New password</span>
+        <input name="password" type="password" required />
+      </label>
+      <label>
+        <span>Confirm password</span>
+        <input name="confirmPassword" type="password" required />
+      </label>
+    </div>
+    <button class="btn" type="submit">Set Password</button>
+  </form>
+  <p><a href="/auth/login">Back to login</a></p>
+</section>
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>

@@ -1,0 +1,19 @@
+<%- include('../partials/layout', { body: (function(){ /*
+<section class="auth">
+  <h1>Log in</h1>
+  <form method="POST" action="/auth/login" class="card form">
+    <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+    <label>
+      <span>Username</span>
+      <input name="username" required />
+    </label>
+    <label>
+      <span>Password</span>
+      <input name="password" type="password" required />
+    </label>
+    <button class="btn" type="submit">Log in</button>
+  </form>
+  <p><a href="/auth/forgot">Forgot your password?</a></p>
+  <p>Don't have an account? <a href="/auth/register">Register</a></p>
+</section>
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>
