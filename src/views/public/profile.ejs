@@ -1,4 +1,4 @@
-<%- include('../partials/layout', { body: (function(){ /*
+<%- include('../partials/header') %>
 <section class="public-profile">
   <header class="profile-header">
     <% if (profile && profile.avatar_path) { %>
@@ -31,4 +31,4 @@
     <% }) %>
   </ul>
 </section>
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>
+<%- include('../partials/footer') %>

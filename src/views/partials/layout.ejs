@@ -28,11 +28,12 @@
     </header>
 
     <main class="container">
-      <% if (messages().error) { %>
-        <div class="alert error"><%= messages().error[0] %></div>
+      <% const __msgs = (typeof messages === 'function') ? messages() : {}; %>
+      <% if (__msgs && __msgs.error) { %>
+        <div class="alert error"><%= __msgs.error[0] %></div>
       <% } %>
-      <% if (messages().success) { %>
-        <div class="alert success"><%= messages().success[0] %></div>
+      <% if (__msgs && __msgs.success) { %>
+        <div class="alert success"><%= __msgs.success[0] %></div>
       <% } %>
       <%- body %>
     </main>

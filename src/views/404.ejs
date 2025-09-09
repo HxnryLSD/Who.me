@@ -1,7 +1,7 @@
-<%- include('partials/layout', { body: (function(){ /*
+<%- include('partials/header') %>
 <section class="not-found">
   <h1>Page not found</h1>
   <p>We couldn't find what you're looking for.</p>
   <a class="btn" href="/">Go home</a>
 </section>
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>
+<%- include('partials/footer') %>

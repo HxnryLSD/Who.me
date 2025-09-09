@@ -1,4 +1,4 @@
-<%- include('../partials/layout', { body: (function(){ /*
+<%- include('../partials/header') %>
 <section class="auth">
   <h1>Log in</h1>
   <form method="POST" action="/auth/login" class="card form">
@@ -16,4 +16,4 @@
   <p><a href="/auth/forgot">Forgot your password?</a></p>
   <p>Don't have an account? <a href="/auth/register">Register</a></p>
 </section>
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>
+<%- include('../partials/footer') %>

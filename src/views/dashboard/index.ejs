@@ -1,4 +1,4 @@
-<%- include('../partials/layout', { body: (function(){ /*
+<%- include('../partials/header') %>
 <section class="dashboard">
   <div class="grid two">
     <div>
@@ -49,7 +49,7 @@
           </label>
           <label>
             <span>Custom CSS</span>
-            <textarea name="custom_css" rows="3" placeholder=":root { /* your vars */ }"> <%= (profile && profile.custom_css) || '' %></textarea>
+            <textarea name="custom_css" rows="3" placeholder=":root { --your-var: value; }"> <%= (profile && profile.custom_css) || '' %></textarea>
           </label>
         </div>
         <button class="btn" type="submit">Save</button>
@@ -259,4 +259,4 @@
   }
 })();
 </script>
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1] }) %>
+<%- include('../partials/footer') %>

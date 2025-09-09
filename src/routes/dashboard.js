@@ -25,6 +25,26 @@ const updateLinkOrder = db.prepare('UPDATE links SET position = ? WHERE id = ? A
 const getLinkById = db.prepare('SELECT * FROM links WHERE id = ? AND user_id = ?');
 const getLinkByPosition = db.prepare('SELECT * FROM links WHERE user_id = ? AND position = ?');
 
+// Projects
+const listProjects = db.prepare('SELECT * FROM projects WHERE user_id = ? ORDER BY position ASC, title ASC');
+const insertProject = db.prepare('INSERT INTO projects (id, user_id, title, description, url, position) VALUES (?, ?, ?, ?, ?, ?)');
+const deleteProject = db.prepare('DELETE FROM projects WHERE id = ? AND user_id = ?');
+const getProjectMaxPos = db.prepare('SELECT MAX(position) as maxPos FROM projects WHERE user_id = ?');
+
+// Experiences
+const listExperiences = db.prepare('SELECT * FROM experiences WHERE user_id = ? ORDER BY position ASC, start_date DESC');
+const insertExperience = db.prepare('INSERT INTO experiences (id, user_id, role, company, start_date, end_date, description, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+const deleteExperience = db.prepare('DELETE FROM experiences WHERE id = ? AND user_id = ?');
+const getExperienceMaxPos = db.prepare('SELECT MAX(position) as maxPos FROM experiences WHERE user_id = ?');
+
+// Contacts
+const listContacts = db.prepare('SELECT * FROM contacts WHERE user_id = ? ORDER BY label ASC');
+const insertContact = db.prepare('INSERT INTO contacts (id, user_id, label, value) VALUES (?, ?, ?, ?)');
+const deleteContact = db.prepare('DELETE FROM contacts WHERE id = ? AND user_id = ?');
+
+// Sessions
+const revokeSessionFlag = db.prepare('UPDATE user_sessions SET active = 0 WHERE session_id = ? AND user_id = ?');
+
 // Vanity/custom domain
 const getUserRoute = db.prepare('SELECT * FROM user_routes WHERE user_id = ?');
 const upsertRoute = db.prepare(`INSERT INTO user_routes (user_id, vanity_path, custom_domain)
@@ -164,6 +184,126 @@ router.post('/routes', ensureAuthenticated, (req, res) => {
   }
   upsertRoute.run(req.user.id, vanity_path || null, custom_domain || null);
   req.flash('success', 'Routing settings saved');
+  res.redirect('/dashboard');
+});
+
+// Projects: create
+router.post('/projects', ensureAuthenticated, (req, res) => {
+  try {
+    const { title, description, url } = req.body;
+    if (!title) {
+      req.flash('error', 'Project title is required');
+      return res.redirect('/dashboard');
+    }
+    const id = uuidv4();
+    const maxPosRow = getProjectMaxPos.get(req.user.id);
+    const nextPos = (maxPosRow?.maxPos || 0) + 1;
+    insertProject.run(id, req.user.id, String(title).trim(), (description||'').trim()||null, (url||'').trim()||null, nextPos);
+    req.flash('success', 'Project added');
+  } catch (e) {
+    req.flash('error', 'Failed to add project');
+  }
+  res.redirect('/dashboard');
+});
+
+// Projects: delete
+router.post('/projects/:id/delete', ensureAuthenticated, (req, res) => {
+  try {
+    deleteProject.run(req.params.id, req.user.id);
+    req.flash('success', 'Project removed');
+  } catch (e) {
+    req.flash('error', 'Failed to remove project');
+  }
+  res.redirect('/dashboard');
+});
+
+// Experiences: create
+router.post('/experiences', ensureAuthenticated, (req, res) => {
+  try {
+    const { role, company, start_date, end_date, description } = req.body;
+    if (!role) {
+      req.flash('error', 'Role is required');
+      return res.redirect('/dashboard');
+    }
+    const id = uuidv4();
+    const maxPosRow = getExperienceMaxPos.get(req.user.id);
+    const nextPos = (maxPosRow?.maxPos || 0) + 1;
+    insertExperience.run(
+      id,
+      req.user.id,
+      String(role).trim(),
+      (company||'').trim()||null,
+      start_date || null,
+      end_date || null,
+      (description||'').trim()||null,
+      nextPos
+    );
+    req.flash('success', 'Experience added');
+  } catch (e) {
+    req.flash('error', 'Failed to add experience');
+  }
+  res.redirect('/dashboard');
+});
+
+// Experiences: delete
+router.post('/experiences/:id/delete', ensureAuthenticated, (req, res) => {
+  try {
+    deleteExperience.run(req.params.id, req.user.id);
+    req.flash('success', 'Experience removed');
+  } catch (e) {
+    req.flash('error', 'Failed to remove experience');
+  }
+  res.redirect('/dashboard');
+});
+
+// Contacts: create
+router.post('/contacts', ensureAuthenticated, (req, res) => {
+  try {
+    const { label, value } = req.body;
+    if (!label || !value) {
+      req.flash('error', 'Both label and value are required');
+      return res.redirect('/dashboard');
+    }
+    const id = uuidv4();
+    insertContact.run(id, req.user.id, String(label).trim(), String(value).trim());
+    req.flash('success', 'Contact added');
+  } catch (e) {
+    req.flash('error', 'Failed to add contact');
+  }
+  res.redirect('/dashboard');
+});
+
+// Contacts: delete
+router.post('/contacts/:id/delete', ensureAuthenticated, (req, res) => {
+  try {
+    deleteContact.run(req.params.id, req.user.id);
+    req.flash('success', 'Contact removed');
+  } catch (e) {
+    req.flash('error', 'Failed to remove contact');
+  }
+  res.redirect('/dashboard');
+});
+
+// Sessions: revoke
+router.post('/sessions/:sid/revoke', ensureAuthenticated, (req, res) => {
+  const sid = req.params.sid;
+  try {
+    revokeSessionFlag.run(sid, req.user.id);
+    const store = req.app?.locals?.sessionStore;
+    if (store && typeof store.destroy === 'function') {
+      store.destroy(sid, (err) => {
+        if (err) console.error('Session destroy error', err);
+      });
+    }
+    if (sid === req.sessionID) {
+      req.logout?.(() => {});
+      req.session?.regenerate?.(() => {});
+    }
+    req.flash('success', 'Session revoked');
+  } catch (e) {
+    console.error('Revoke session error', e);
+    req.flash('error', 'Failed to revoke session');
+  }
   res.redirect('/dashboard');
 });
 
